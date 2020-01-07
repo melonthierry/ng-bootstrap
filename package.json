@@ -1,5 +1,5 @@
 {
-  "name": "@ng-bootstrap/ng-bootstrap",
+  "name": "@melonthierry/ng-bootstrap",
   "version": "5.1.4",
   "description": "Angular powered Bootstrap",
   "author": "https://github.com/ng-bootstrap/ng-bootstrap/graphs/contributors",
@@ -51,7 +51,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ng-bootstrap/ng-bootstrap.git"
+    "url": "git+https://github.com/melonthierry/ng-bootstrap.git"
   },
   "license": "MIT",
   "bugs": {
