@@ -12,12 +12,14 @@ import {DayTemplateContext} from './datepicker-day-template-context';
   template: `
     <div *ngIf="showWeekdays" class="ngb-dp-week ngb-dp-weekdays" role="row">
       <div *ngIf="showWeekNumbers" class="ngb-dp-weekday ngb-dp-showweek"></div>
-      <div *ngFor="let w of month.weekdays" class="ngb-dp-weekday small" role="columnheader">
-        {{ i18n.getWeekdayShortName(w) }}
+      <div class="day-of-week">
+        <div *ngFor="let w of month.weekdays" class="ngb-dp-weekday small" role="columnheader">
+          {{ i18n.getWeekdayShortName(w) }}
+        </div>
       </div>
     </div>
     <ng-template ngFor let-week [ngForOf]="month.weeks">
-      <div *ngIf="!week.collapsed" class="ngb-dp-week" role="row">
+      <div *ngIf="!week.collapsed" class="ngb-dp-week single-days" role="row">
         <div *ngIf="showWeekNumbers" class="ngb-dp-week-number small text-muted">{{ i18n.getWeekNumerals(week.number) }}</div>
         <div *ngFor="let day of week.days" (click)="doSelect(day)" class="ngb-dp-day" role="gridcell"
           [class.disabled]="day.context.disabled"

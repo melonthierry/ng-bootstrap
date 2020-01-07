@@ -1,6 +1,8 @@
 ngb-datepicker-navigation {
   display: flex;
   align-items: center;
+  margin: 0 auto;
+  width: 228px;
 }
 
 .ngb-dp {
@@ -37,8 +39,8 @@ ngb-datepicker-navigation {
   }
 
   &-arrow-btn {
-    padding: 0 0.25rem;
-    margin: 0 0.5rem;
+    padding: 0;
+    margin: 0;
     border: none;
     background-color: transparent;
     z-index: 1;
@@ -57,7 +59,10 @@ ngb-datepicker-navigation {
   }
 
   &-month-name {
-    font-size: larger;
+    color: #595959;
+    font-size: 21px;
+    font-family: 'Lato', sans-serif;
+    font-weight: bold;
     height: 2rem;
     line-height: 2rem;
     text-align: center;
@@ -67,4 +72,28 @@ ngb-datepicker-navigation {
     display: flex;
     flex: 1 1 9rem;
   }
+}
+
+.arrow-btn-right {
+  height: 10px;
+  margin-left: 81%;
+  width: 6px;
+}
+
+.arrow-btn-left {
+  height: 10px;
+  margin-right: 81%;
+  width: 6px;
+}
+
+.arrow-btn-left-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.arrow-btn-right-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }

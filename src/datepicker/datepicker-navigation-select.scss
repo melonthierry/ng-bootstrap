@@ -13,3 +13,10 @@ ngb-datepicker-navigation-select > .custom-select {
     background-color: transparent !important;
   }
 }
+
+.day-of-week {
+  border-bottom: 1px solid #c8c9cc;
+  display: grid;
+  grid-template-columns: 33px 33px 33px 33px 33px 33px 33px;
+  grid-column-gap: 5px;
+}

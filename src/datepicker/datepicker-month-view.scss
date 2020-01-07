@@ -7,21 +7,19 @@ ngb-datepicker-month-view {
   &-week-number {
     line-height: 2rem;
     text-align: center;
-    font-style: italic;
   }
   &-weekday {
-    color: #5bc0de;
-    color: var(--info);
+    font-size: 13px;
+    color: #adadad;
+    font-family: 'Lato', sans-serif;
   }
   &-week {
     border-radius: 0.25rem;
     display: flex;
   }
   &-weekdays {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
     border-radius: 0;
-    background-color: #f8f9fa;
-    background-color: var(--light);
+    padding-bottom: 20px;
   }
   &-day,
   &-weekday,
@@ -39,6 +37,165 @@ ngb-datepicker-month-view {
 
     &[tabindex="0"] {
       z-index: 1;
+    }
+  }
+}
+
+.single-days {
+  display: flex;
+  margin-bottom: 6px;
+
+  .ngb-dp-day {
+    width: 33px;
+    height: 30px;
+    margin-right: 5px;
+  }
+}
+
+.custom-day.range {
+  background-color: #007bf7;
+}
+
+.custom-day {
+  display: inline-block;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+}
+
+.custom-day.faded {
+  background-color: rgb(105, 177, 247);
+  position: relative;
+
+  &::before {
+    background-color: rgb(105, 177, 247);
+    content: '';
+    position: absolute;
+    left: -6px;
+    width: 6px;
+    height: 100%;
+
+  }
+}
+
+.single-days {
+  .ngb-dp-day:first-child {
+    .custom-day.faded {
+      &::before {
+        width: 0;
+        height: 100%;
+      }
+    }
+  }
+}
+
+.untilDate {
+  background-color: initial;
+  position: relative;
+
+  &:after {
+    border-radius: 20px;
+    content: '';
+    background-color: #007bf7;
+  }
+
+  &::before {
+    background-color: rgb(105, 177, 247);
+    content: '';
+    width: 25px;
+    width: 25px;
+    height: 100%;
+    left: -6px;
+  }
+}
+
+.custom-day-container {
+  height: 100%;
+  position: relative;
+  width: 100%;
+
+  span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.custom-day-container {
+  .range {
+    background-color: #69b0f7;
+    color: #ffffff;
+    position: relative;
+
+    &::before {
+      content: '';
+      background-color: #69b0f7;
+      width: 10px;
+      position: absolute;
+      height: 100%;
+      right: -10px;
+    }
+
+    &:hover {
+      color: #ffffff;
+    }
+  }
+
+  .fromDate {
+    background: #007bf7;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 1;
+  }
+
+  .backgroundFromDate {
+    float: right;
+    height: 100%;
+    display: block;
+    background: #69b0f7;
+    width: 50%;
+  }
+
+  .untilDate {
+    background: #007bf7;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 1;
+
+    &::before {
+      display: none;
+    }
+  }  
+
+  .backgroundUntilDate {
+    float: left;
+    height: 100%;
+    display: block;
+    background: #69b0f7;
+    width: 50%;
+  }
+
+  span:hover {
+    color: #007bf7;
+  }
+
+  .focused {
+    &::before {
+      display: none;
+    }
+  }
+}
+
+.single-days {
+  .ngb-dp-day{
+    &:last-of-type {
+      .range {
+        &::before{
+          display: none;
+        }
+      }
     }
   }
 }

@@ -9,11 +9,11 @@ import {NgbDatepickerI18n} from './datepicker-i18n';
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./datepicker-navigation.scss'],
   template: `
-    <div class="ngb-dp-arrow">
-      <button type="button" class="btn btn-link ngb-dp-arrow-btn" (click)="onClickPrev($event)" [disabled]="prevDisabled"
+    <div class="ngb-dp-arrow arrow-btn-left-container">
+      <button type="button" class="btn btn-link ngb-dp-arrow-btn arrow-btn-left" (click)="onClickPrev($event)" [disabled]="prevDisabled"
               i18n-aria-label="@@ngb.datepicker.previous-month" aria-label="Previous month"
               i18n-title="@@ngb.datepicker.previous-month" title="Previous month">
-        <span class="ngb-dp-navigation-chevron"></span>
+        
       </button>
     </div>
     <ngb-datepicker-navigation-select *ngIf="showSelect" class="ngb-dp-navigation-select"
@@ -31,11 +31,10 @@ import {NgbDatepickerI18n} from './datepicker-i18n';
       </div>
       <div class="ngb-dp-arrow" *ngIf="i !== months.length - 1"></div>
     </ng-template>
-    <div class="ngb-dp-arrow right">
-      <button type="button" class="btn btn-link ngb-dp-arrow-btn" (click)="onClickNext($event)" [disabled]="nextDisabled"
+    <div class="ngb-dp-arrow arrow-btn-right-container">
+      <button type="button" class="btn btn-link ngb-dp-arrow-btn arrow-btn-right" (click)="onClickNext($event)" [disabled]="nextDisabled"
               i18n-aria-label="@@ngb.datepicker.next-month" aria-label="Next month"
               i18n-title="@@ngb.datepicker.next-month" title="Next month">
-        <span class="ngb-dp-navigation-chevron"></span>
       </button>
     </div>
     `

@@ -1,7 +1,8 @@
 ngb-datepicker {
-  border: 1px solid #dfdfdf;
-  border-radius: .25rem;
+  border-radius: 8px;
   display: inline-block;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+  width: 320px;
 
   &-month-view {
     pointer-events: auto;
@@ -20,9 +21,8 @@ ngb-datepicker {
   &-header {
     border-bottom: 0;
     border-radius: .25rem .25rem 0 0;
-    padding-top: .25rem;
-    background-color: #f8f9fa;
-    background-color: var(--light);
+    padding-top: 27px;
+    padding-bottom: 20px;
   }
 
   &-months {
@@ -37,8 +37,6 @@ ngb-datepicker {
       height: 2rem;
       line-height: 2rem;
       text-align: center;
-      background-color: #f8f9fa;
-      background-color: var(--light);
     }
 
     & + & {
@@ -48,15 +46,31 @@ ngb-datepicker {
     }
 
     &:last-child .ngb-dp-week {
-      padding-right: .25rem;
+      padding-right: 30px;
     }
 
     &:first-child .ngb-dp-week {
-      padding-left: .25rem;
+      padding-left: 30px;
     }
 
     .ngb-dp-week:last-child {
-      padding-bottom: .25rem;
+      padding-bottom: 28px;
     }
   }
+}
+
+.btn-light {
+  color: #595959;
+  font-size: 15px;
+  font-weight: bold;
+  font-family: 'Lato', sans-serif;
+}
+
+.btn-light:hover {
+  background: initial;
+  color: #007bf7;
+}
+
+.text-muted {
+  font-family: 'Lato', sans-serif;
 }
