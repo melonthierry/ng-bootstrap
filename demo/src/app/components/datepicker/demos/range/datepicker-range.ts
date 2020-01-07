@@ -43,8 +43,7 @@ export class NgbdDatepickerRange {
   }
 
   isMuted(date: NgbDate) {
-    return date.month !== this.fromDate.month
-    //return !this.selected && (this.date.month !== this.currentMonth || this.disabled); 
+    return date.month !== this.fromDate.month;
   }
 
   isFromDate(date: NgbDate) {

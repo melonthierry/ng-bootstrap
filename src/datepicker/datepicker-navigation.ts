@@ -13,7 +13,6 @@ import {NgbDatepickerI18n} from './datepicker-i18n';
       <button type="button" class="btn btn-link ngb-dp-arrow-btn arrow-btn-left" (click)="onClickPrev($event)" [disabled]="prevDisabled"
               i18n-aria-label="@@ngb.datepicker.previous-month" aria-label="Previous month"
               i18n-title="@@ngb.datepicker.previous-month" title="Previous month">
-        
       </button>
     </div>
     <ngb-datepicker-navigation-select *ngIf="showSelect" class="ngb-dp-navigation-select"
