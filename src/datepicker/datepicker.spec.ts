@@ -1,19 +1,18 @@
 import {TestBed, ComponentFixture, async, inject, fakeAsync, tick} from '@angular/core/testing';
-import {createGenericTestComponent} from '../test/common';
+import {createGenericTestComponent, isBrowser} from '../test/common';
 import {getMonthSelect, getYearSelect, getNavigationLinks} from '../test/datepicker/common';
 
 import {Component, TemplateRef, DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators} from '@angular/forms';
 
-import {NgbCalendar} from './ngb-calendar';
 import {NgbDatepickerModule, NgbDatepickerNavigateEvent} from './datepicker.module';
 import {NgbDate} from './ngb-date';
 import {NgbDatepickerConfig} from './datepicker-config';
 import {NgbDatepicker, NgbDatepickerState} from './datepicker';
 import {DayTemplateContext} from './datepicker-day-template-context';
 import {NgbDateStruct} from './ngb-date-struct';
-import {NgbDatepickerMonthView} from './datepicker-month-view';
+import {NgbDatepickerMonth} from './datepicker-month';
 import {NgbDatepickerDayView} from './datepicker-day-view';
 import {NgbDatepickerKeyboardService} from './datepicker-keyboard-service';
 import {NgbDatepickerNavigationSelect} from './datepicker-navigation-select';
@@ -59,17 +58,17 @@ function triggerKeyDown(element: DebugElement, keyCode: number, shiftKey = false
     stopPropagation: function() { this.propagationStopped = true; },
     preventDefault: function() { this.defaultPrevented = true; }
   };
-  expect(document.activeElement.classList.contains('ngb-dp-day'))
+  expect(document.activeElement !.classList.contains('ngb-dp-day'))
       .toBeTruthy('You must focus day before triggering key events');
   element.triggerEventHandler('keydown', event);
   return event;
 }
 
 function getMonthContainer(datepicker: DebugElement) {
-  return datepicker.query(By.css('div.ngb-dp-months'));
+  return datepicker.query(By.css('ngb-datepicker-month'));
 }
 
-function expectSelectedDate(element: DebugElement, selectedDate: NgbDate) {
+function expectSelectedDate(element: DebugElement, selectedDate: NgbDate | null) {
   // checking we have 1 day with .selected class
   const days = getSelectedDays(element);
 
@@ -78,7 +77,7 @@ function expectSelectedDate(element: DebugElement, selectedDate: NgbDate) {
 
     // checking it corresponds to our date
     const day = days[0];
-    const dayView = day.parent.query(By.directive(NgbDatepickerDayView)).componentInstance as NgbDatepickerDayView;
+    const dayView = day.parent !.query(By.directive(NgbDatepickerDayView)).componentInstance as NgbDatepickerDayView;
     expect(NgbDate.from(dayView.date)).toEqual(selectedDate);
   } else {
     expect(days.length).toBe(0);
@@ -169,6 +168,20 @@ describe('ngb-datepicker', () => {
     }).toThrowError();
   });
 
+  it('should allow changing min/max dates at the same time', () => {
+    const fixture = createTestComponent('<ngb-datepicker [minDate]="minDate" [maxDate]="maxDate"></ngb-datepicker>');
+
+    expect(() => {
+      fixture.componentInstance.minDate = {year: 2110, month: 1, day: 1};
+      fixture.componentInstance.maxDate = {year: 2120, month: 12, day: 31};
+      fixture.detectChanges();
+
+      fixture.componentInstance.minDate = {year: 2010, month: 1, day: 1};
+      fixture.componentInstance.maxDate = {year: 2020, month: 12, day: 31};
+      fixture.detectChanges();
+    }).not.toThrowError();
+  });
+
   it('should handle incorrect startDate values', () => {
     const fixture = createTestComponent(`<ngb-datepicker [startDate]="date"></ngb-datepicker>`);
     const today = new Date();
@@ -178,12 +191,12 @@ describe('ngb-datepicker', () => {
     expect(getMonthSelect(fixture.nativeElement).value).toBe('8');
     expect(getYearSelect(fixture.nativeElement).value).toBe('2016');
 
-    fixture.componentInstance.date = null;
+    fixture.componentInstance.date = <any>null;
     fixture.detectChanges();
     expect(getMonthSelect(fixture.nativeElement).value).toBe(currentMonth);
     expect(getYearSelect(fixture.nativeElement).value).toBe(currentYear);
 
-    fixture.componentInstance.date = undefined;
+    fixture.componentInstance.date = <any>undefined;
     fixture.detectChanges();
     expect(getMonthSelect(fixture.nativeElement).value).toBe(currentMonth);
     expect(getYearSelect(fixture.nativeElement).value).toBe(currentYear);
@@ -305,12 +318,12 @@ describe('ngb-datepicker', () => {
     expectMinDate(1000, 1);
 
     // resetting
-    fixture.componentInstance.minDate = null;
+    fixture.componentInstance.minDate = <any>null;
     fixture.detectChanges();
     expectMinDate(1000, 1);
 
     // resetting
-    fixture.componentInstance.minDate = undefined;
+    fixture.componentInstance.minDate = <any>undefined;
     fixture.detectChanges();
     expectMinDate(1000, 1);
   });
@@ -344,12 +357,12 @@ describe('ngb-datepicker', () => {
     expectMaxDate(10000, 1);
 
     // resetting
-    fixture.componentInstance.maxDate = null;
+    fixture.componentInstance.maxDate = <any>null;
     fixture.detectChanges();
     expectMaxDate(10000, 1);
 
     // resetting
-    fixture.componentInstance.maxDate = undefined;
+    fixture.componentInstance.maxDate = <any>undefined;
     fixture.detectChanges();
     expectMaxDate(10000, 1);
   });
@@ -393,12 +406,12 @@ describe('ngb-datepicker', () => {
   it('should display multiple months', () => {
     const fixture = createTestComponent(`<ngb-datepicker [displayMonths]="displayMonths"></ngb-datepicker>`);
 
-    let months = fixture.debugElement.queryAll(By.directive(NgbDatepickerMonthView));
+    let months = fixture.debugElement.queryAll(By.directive(NgbDatepickerMonth));
     expect(months.length).toBe(1);
 
     fixture.componentInstance.displayMonths = 3;
     fixture.detectChanges();
-    months = fixture.debugElement.queryAll(By.directive(NgbDatepickerMonthView));
+    months = fixture.debugElement.queryAll(By.directive(NgbDatepickerMonth));
     expect(months.length).toBe(3);
   });
 
@@ -611,22 +624,22 @@ describe('ngb-datepicker', () => {
   });
 
   it('should emit select event when select date', () => {
-    const fixture =
-        createTestComponent(`<ngb-datepicker #dp [startDate]="date" (select)="onSelect($event)"></ngb-datepicker>`);
+    const fixture = createTestComponent(
+        `<ngb-datepicker #dp [startDate]="date" (dateSelect)="onDateSelect($event)"></ngb-datepicker>`);
 
-    spyOn(fixture.componentInstance, 'onSelect');
+    spyOn(fixture.componentInstance, 'onDateSelect');
     let dates = getDates(fixture.nativeElement);
     dates[11].click();
 
     fixture.detectChanges();
-    expect(fixture.componentInstance.onSelect).toHaveBeenCalledTimes(1);
+    expect(fixture.componentInstance.onDateSelect).toHaveBeenCalledTimes(1);
   });
 
   it('should emit select event twice when select same date twice', () => {
-    const fixture =
-        createTestComponent(`<ngb-datepicker #dp [startDate]="date" (select)="onSelect($event)"></ngb-datepicker>`);
+    const fixture = createTestComponent(
+        `<ngb-datepicker #dp [startDate]="date" (dateSelect)="onDateSelect($event)"></ngb-datepicker>`);
 
-    spyOn(fixture.componentInstance, 'onSelect');
+    spyOn(fixture.componentInstance, 'onDateSelect');
     let dates = getDates(fixture.nativeElement);
 
     dates[11].click();
@@ -635,15 +648,15 @@ describe('ngb-datepicker', () => {
     dates[11].click();
     fixture.detectChanges();
 
-    expect(fixture.componentInstance.onSelect).toHaveBeenCalledTimes(2);
+    expect(fixture.componentInstance.onDateSelect).toHaveBeenCalledTimes(2);
   });
 
   it('should emit select event twice when press enter key twice', () => {
-    const fixture =
-        createTestComponent(`<ngb-datepicker #dp [startDate]="date" (select)="onSelect($event)"></ngb-datepicker>`);
+    const fixture = createTestComponent(
+        `<ngb-datepicker #dp [startDate]="date" (dateSelect)="onDateSelect($event)"></ngb-datepicker>`);
     const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
 
-    spyOn(fixture.componentInstance, 'onSelect');
+    spyOn(fixture.componentInstance, 'onDateSelect');
 
     focusDay();
     fixture.detectChanges();
@@ -653,15 +666,15 @@ describe('ngb-datepicker', () => {
 
     triggerKeyDown(getMonthContainer(datepicker), 13 /* enter */);
     fixture.detectChanges();
-    expect(fixture.componentInstance.onSelect).toHaveBeenCalledTimes(2);
+    expect(fixture.componentInstance.onDateSelect).toHaveBeenCalledTimes(2);
   });
 
   it('should emit select event twice when press space key twice', () => {
-    const fixture =
-        createTestComponent(`<ngb-datepicker #dp [startDate]="date" (select)="onSelect($event)"></ngb-datepicker>`);
+    const fixture = createTestComponent(
+        `<ngb-datepicker #dp [startDate]="date" (dateSelect)="onDateSelect($event)"></ngb-datepicker>`);
     const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
 
-    spyOn(fixture.componentInstance, 'onSelect');
+    spyOn(fixture.componentInstance, 'onDateSelect');
 
     focusDay();
     fixture.detectChanges();
@@ -671,7 +684,7 @@ describe('ngb-datepicker', () => {
 
     triggerKeyDown(getMonthContainer(datepicker), 32 /* space */);
     fixture.detectChanges();
-    expect(fixture.componentInstance.onSelect).toHaveBeenCalledTimes(2);
+    expect(fixture.componentInstance.onDateSelect).toHaveBeenCalledTimes(2);
   });
 
   it('should insert an embedded view for footer when `footerTemplate` provided', () => {
@@ -862,185 +875,186 @@ describe('ngb-datepicker', () => {
 
   describe('keyboard navigation', () => {
 
-    const template = `<ngb-datepicker #dp
+    if (!isBrowser('ie10')) {
+      const template = `<ngb-datepicker #dp
         [startDate]="date" [minDate]="minDate"
         [maxDate]="maxDate" [displayMonths]="2"
         [markDisabled]="markDisabled"></ngb-datepicker>
         <input id="focusout">
         `;
 
-    it('should move focus with arrow keys', () => {
-      const fixture = createTestComponent(template);
+      it('should move focus with arrow keys', () => {
+        const fixture = createTestComponent(template);
 
-      const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
+        const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
 
-      // focus in
-      focusDay();
+        // focus in
+        focusDay();
 
-      triggerKeyDown(getMonthContainer(datepicker), 40 /* down arrow */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 8));
-      expectSelectedDate(datepicker, null);
+        triggerKeyDown(getMonthContainer(datepicker), 40 /* down arrow */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 8));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 39 /* right arrow */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 9));
-      expectSelectedDate(datepicker, null);
+        triggerKeyDown(getMonthContainer(datepicker), 39 /* right arrow */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 9));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 38 /* up arrow */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 2));
-      expectSelectedDate(datepicker, null);
+        triggerKeyDown(getMonthContainer(datepicker), 38 /* up arrow */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 2));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 37 /* left arrow */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 1));
-      expectSelectedDate(datepicker, null);
-    });
+        triggerKeyDown(getMonthContainer(datepicker), 37 /* left arrow */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 1));
+        expectSelectedDate(datepicker, null);
+      });
 
-    it('should select focused date with enter or space', () => {
-      const fixture = createTestComponent(template);
+      it('should select focused date with enter or space', () => {
+        const fixture = createTestComponent(template);
 
-      const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
+        const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
 
-      focusDay();
+        focusDay();
 
-      triggerKeyDown(getMonthContainer(datepicker), 32 /* space */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 1));
-      expectSelectedDate(datepicker, new NgbDate(2016, 8, 1));
+        triggerKeyDown(getMonthContainer(datepicker), 32 /* space */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 1));
+        expectSelectedDate(datepicker, new NgbDate(2016, 8, 1));
 
-      triggerKeyDown(getMonthContainer(datepicker), 40 /* down arrow */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 8));
-      expectSelectedDate(datepicker, new NgbDate(2016, 8, 1));
+        triggerKeyDown(getMonthContainer(datepicker), 40 /* down arrow */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 8));
+        expectSelectedDate(datepicker, new NgbDate(2016, 8, 1));
 
-      triggerKeyDown(getMonthContainer(datepicker), 13 /* enter */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 8));
-      expectSelectedDate(datepicker, new NgbDate(2016, 8, 8));
-    });
+        triggerKeyDown(getMonthContainer(datepicker), 13 /* enter */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 8));
+        expectSelectedDate(datepicker, new NgbDate(2016, 8, 8));
+      });
 
-    it('should select first and last dates of the view with home/end', () => {
-      const fixture = createTestComponent(template);
+      it('should select first and last dates of the view with home/end', () => {
+        const fixture = createTestComponent(template);
 
-      const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
+        const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
 
-      focusDay();
+        focusDay();
 
-      triggerKeyDown(getMonthContainer(datepicker), 35 /* end */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 9, 30));
-      expectSelectedDate(datepicker, null);
+        triggerKeyDown(getMonthContainer(datepicker), 35 /* end */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 9, 30));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 36 /* home */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 1));
-      expectSelectedDate(datepicker, null);
-    });
+        triggerKeyDown(getMonthContainer(datepicker), 36 /* home */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 1));
+        expectSelectedDate(datepicker, null);
+      });
 
-    it('should select min and max dates with shift+home/end', () => {
-      const fixture = createTestComponent(template);
+      it('should select min and max dates with shift+home/end', () => {
+        const fixture = createTestComponent(template);
 
-      const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
+        const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
 
-      focusDay();
+        focusDay();
 
-      triggerKeyDown(getMonthContainer(datepicker), 35 /* end */, true /* shift */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2020, 12, 31));
-      expectSelectedDate(datepicker, null);
+        triggerKeyDown(getMonthContainer(datepicker), 35 /* end */, true /* shift */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2020, 12, 31));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 40 /* down arrow */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2020, 12, 31));
-      expectSelectedDate(datepicker, null);
+        triggerKeyDown(getMonthContainer(datepicker), 40 /* down arrow */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2020, 12, 31));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 36 /* home */, true /* shift */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2010, 1, 1));
-      expectSelectedDate(datepicker, null);
+        triggerKeyDown(getMonthContainer(datepicker), 36 /* home */, true /* shift */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2010, 1, 1));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 38 /* up arrow */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2010, 1, 1));
-      expectSelectedDate(datepicker, null);
-    });
+        triggerKeyDown(getMonthContainer(datepicker), 38 /* up arrow */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2010, 1, 1));
+        expectSelectedDate(datepicker, null);
+      });
 
-    it('should navigate between months with pageUp/Down', () => {
-      const fixture = createTestComponent(template);
+      it('should navigate between months with pageUp/Down', () => {
+        const fixture = createTestComponent(template);
 
-      let datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
+        let datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
 
-      focusDay();
+        focusDay();
 
-      triggerKeyDown(getMonthContainer(datepicker), 39 /* right arrow */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 2));
-      expectSelectedDate(datepicker, null);
+        triggerKeyDown(getMonthContainer(datepicker), 39 /* right arrow */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 2));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 33 /* page up */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 7, 2));
-      expectSelectedDate(datepicker, null);
+        triggerKeyDown(getMonthContainer(datepicker), 33 /* page up */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 7, 2));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 34 /* page down */);
-      fixture.detectChanges();
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 2));
-      expectSelectedDate(datepicker, null);
+        triggerKeyDown(getMonthContainer(datepicker), 34 /* page down */);
+        fixture.detectChanges();
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 2));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 34 /* page down */);
-      fixture.detectChanges();
+        triggerKeyDown(getMonthContainer(datepicker), 34 /* page down */);
+        fixture.detectChanges();
 
-      expectFocusedDate(datepicker, new NgbDate(2016, 9, 2));
-      expectSelectedDate(datepicker, null);
+        expectFocusedDate(datepicker, new NgbDate(2016, 9, 2));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 34 /* page down */);
-      fixture.detectChanges();
-      datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
-      expectFocusedDate(datepicker, new NgbDate(2016, 10, 2));
-      expectSelectedDate(datepicker, null);
-    });
+        triggerKeyDown(getMonthContainer(datepicker), 34 /* page down */);
+        fixture.detectChanges();
+        datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
+        expectFocusedDate(datepicker, new NgbDate(2016, 10, 2));
+        expectSelectedDate(datepicker, null);
+      });
 
-    it('should navigate between years with shift+pageUp/Down', () => {
-      const fixture = createTestComponent(template);
+      it('should navigate between years with shift+pageUp/Down', () => {
+        const fixture = createTestComponent(template);
 
-      const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
-      focusDay();
+        const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
+        focusDay();
 
-      getMonthContainer(datepicker).triggerEventHandler('focus', {});
-      fixture.detectChanges();
+        getMonthContainer(datepicker).triggerEventHandler('focus', {});
+        fixture.detectChanges();
 
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 1));
-      expectSelectedDate(datepicker, null);
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 1));
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 33 /* page up */, true /* shift */);
-      fixture.detectChanges();
+        triggerKeyDown(getMonthContainer(datepicker), 33 /* page up */, true /* shift */);
+        fixture.detectChanges();
 
-      expectFocusedDate(datepicker, new NgbDate(2015, 8, 1), true);
-      expectSelectedDate(datepicker, null);
+        expectFocusedDate(datepicker, new NgbDate(2015, 8, 1), true);
+        expectSelectedDate(datepicker, null);
 
-      triggerKeyDown(getMonthContainer(datepicker), 34 /* page down */, true /* shift */);
-      fixture.detectChanges();
+        triggerKeyDown(getMonthContainer(datepicker), 34 /* page down */, true /* shift */);
+        fixture.detectChanges();
 
-      expectFocusedDate(datepicker, new NgbDate(2016, 8, 1));
-      expectSelectedDate(datepicker, null);
-    });
+        expectFocusedDate(datepicker, new NgbDate(2016, 8, 1));
+        expectSelectedDate(datepicker, null);
+      });
 
-    it(`shouldn't be focusable when disabled`, fakeAsync(() => {
-         const fixture =
-             createTestComponent(`<ngb-datepicker #dp [(ngModel)]="model" [disabled]="true"></ngb-datepicker>`);
-         tick();
-         fixture.detectChanges();
+      it(`shouldn't be focusable when disabled`, fakeAsync(() => {
+           const fixture =
+               createTestComponent(`<ngb-datepicker #dp [(ngModel)]="model" [disabled]="true"></ngb-datepicker>`);
+           tick();
+           fixture.detectChanges();
 
-         const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
+           const datepicker = fixture.debugElement.query(By.directive(NgbDatepicker));
 
-         const days = getFocusableDays(datepicker);
+           const days = getFocusableDays(datepicker);
 
-         expect(days.length).toEqual(0, 'A focusable day has been found');
+           expect(days.length).toEqual(0, 'A focusable day has been found');
 
-       }));
-
+         }));
+    }
   });
 
   describe('forms', () => {
@@ -1201,10 +1215,9 @@ describe('ngb-datepicker', () => {
 
     let mockState: NgbDatepickerState;
     let dp: NgbDatepicker;
-    const mockKeyboardService: NgbDatepickerKeyboardService = {
-      processKey(event: KeyboardEvent, datepicker: NgbDatepicker, calendar: NgbCalendar) {
-        mockState = datepicker.state;
-      }
+    let mv: NgbDatepickerMonth;
+    const mockKeyboardService: Partial<NgbDatepickerKeyboardService> = {
+      processKey(event: KeyboardEvent, datepicker: NgbDatepicker) { mockState = datepicker.state; }
     };
 
     beforeEach(() => {
@@ -1216,58 +1229,67 @@ describe('ngb-datepicker', () => {
           `<ngb-datepicker [startDate]="date" [minDate]="minDate" [maxDate]="maxDate"></ngb-datepicker>`);
       fixture.detectChanges();
       dp = <NgbDatepicker>fixture.debugElement.query(By.directive(NgbDatepicker)).componentInstance;
+      mv = fixture.debugElement.query(By.css('ngb-datepicker-month')).injector.get(NgbDatepickerMonth);
     });
 
     it('should provide an defensive copy of minDate', () => {
-      dp.onKeyDown(<KeyboardEvent>{});
-      expect(mockState.firstDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}));
-      expect(mockState.lastDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 31}));
+      mv.onKeyDown(<KeyboardEvent>{});
+      expect(mockState.firstDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}) !);
+      expect(mockState.lastDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 31}) !);
       expect(mockState.minDate).toEqual(NgbDate.from({year: 2010, month: 1, day: 1}));
       expect(mockState.maxDate).toEqual(NgbDate.from({year: 2020, month: 12, day: 31}));
       Object.assign(mockState, {minDate: undefined});
-      dp.onKeyDown(<KeyboardEvent>{});
+      mv.onKeyDown(<KeyboardEvent>{});
       expect(dp.model.minDate).toEqual(NgbDate.from({year: 2010, month: 1, day: 1}));
     });
 
     it('should provide an defensive copy of maxDate', () => {
-      dp.onKeyDown(<KeyboardEvent>{});
-      expect(mockState.firstDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}));
-      expect(mockState.lastDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 31}));
+      mv.onKeyDown(<KeyboardEvent>{});
+      expect(mockState.firstDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}) !);
+      expect(mockState.lastDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 31}) !);
       expect(mockState.minDate).toEqual(NgbDate.from({year: 2010, month: 1, day: 1}));
       expect(mockState.maxDate).toEqual(NgbDate.from({year: 2020, month: 12, day: 31}));
       Object.assign(mockState, {maxDate: undefined});
-      dp.onKeyDown(<KeyboardEvent>{});
+      mv.onKeyDown(<KeyboardEvent>{});
       expect(dp.model.maxDate).toEqual(NgbDate.from({year: 2020, month: 12, day: 31}));
     });
 
     it('should provide an defensive copy of firstDate', () => {
-      dp.onKeyDown(<KeyboardEvent>{});
-      expect(mockState.firstDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}));
-      expect(mockState.lastDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 31}));
+      mv.onKeyDown(<KeyboardEvent>{});
+      expect(mockState.firstDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}) !);
+      expect(mockState.lastDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 31}) !);
       expect(mockState.minDate).toEqual(NgbDate.from({year: 2010, month: 1, day: 1}));
       expect(mockState.maxDate).toEqual(NgbDate.from({year: 2020, month: 12, day: 31}));
       Object.assign(mockState, {firstDate: undefined});
-      dp.onKeyDown(<KeyboardEvent>{});
+      mv.onKeyDown(<KeyboardEvent>{});
       expect(dp.model.firstDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}));
     });
 
     it('should provide an defensive copy of lastDate', () => {
-      dp.onKeyDown(<KeyboardEvent>{});
-      expect(mockState.firstDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}));
-      expect(mockState.lastDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 31}));
+      mv.onKeyDown(<KeyboardEvent>{});
+      expect(mockState.firstDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}) !);
+      expect(mockState.lastDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 31}) !);
       expect(mockState.minDate).toEqual(NgbDate.from({year: 2010, month: 1, day: 1}));
       expect(mockState.maxDate).toEqual(NgbDate.from({year: 2020, month: 12, day: 31}));
       Object.assign(mockState, {lastDate: undefined});
-      dp.onKeyDown(<KeyboardEvent>{});
+      mv.onKeyDown(<KeyboardEvent>{});
       expect(dp.model.lastDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 31}));
     });
 
     it('should provide an defensive copy of focusedDate', () => {
-      dp.onKeyDown(<KeyboardEvent>{});
-      expect(mockState.focusedDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}));
+      mv.onKeyDown(<KeyboardEvent>{});
+      expect(mockState.focusedDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}) !);
       Object.assign(mockState, {focusedDate: undefined});
-      dp.onKeyDown(<KeyboardEvent>{});
+      mv.onKeyDown(<KeyboardEvent>{});
       expect(dp.model.focusDate).toEqual(NgbDate.from({year: 2016, month: 8, day: 1}));
+    });
+
+    it('should prevent overriding of calendar', () => {
+      try {
+        (<any>dp)['calendar'] = null;
+      } catch (e) {
+      }
+      expect(dp.calendar).toBeTruthy();
     });
   });
 });
@@ -1284,9 +1306,9 @@ class TestComponent {
   model;
   showWeekdays = true;
   dayTemplateData = () => '!';
-  markDisabled = (date: NgbDateStruct) => { return NgbDate.from(date).equals(new NgbDate(2016, 8, 22)); };
+  markDisabled = (date: NgbDateStruct) => { return NgbDate.from(date) !.equals(new NgbDate(2016, 8, 22)); };
   onNavigate = () => {};
-  onSelect = () => {};
+  onDateSelect = () => {};
   getDate = () => ({year: 2016, month: 8});
   onPreventableNavigate = (event: NgbDatepickerNavigateEvent) => event.preventDefault();
 }

@@ -4,7 +4,6 @@ import {NgbCalendar, NgbCalendarGregorian} from './ngb-calendar';
 import {TestBed} from '@angular/core/testing';
 import {NgbDate} from './ngb-date';
 import {Key} from '../util/key';
-import {Type} from '@angular/core';
 
 const event = (keyCode: number, shift = false) =>
     <any>({which: keyCode, shiftKey: shift, preventDefault: () => {}, stopPropagation: () => {}});
@@ -14,19 +13,19 @@ describe('ngb-datepicker-keyboard-service', () => {
   let service: NgbDatepickerKeyboardService;
   let calendar: NgbCalendar;
   let mock: Partial<NgbDatepicker>;
-  let processKey = function(e: KeyboardEvent) { service.processKey(e, mock as NgbDatepicker, calendar); };
+  let processKey = function(e: KeyboardEvent) { service.processKey(e, mock as NgbDatepicker); };
   let state: NgbDatepickerState = Object.assign({focusedDate: {day: 1, month: 1, year: 2018}});
 
   beforeEach(() => {
     TestBed.configureTestingModule(
         {providers: [{provide: NgbCalendar, useClass: NgbCalendarGregorian}, NgbDatepickerKeyboardService]});
 
-    calendar = TestBed.get(NgbCalendar as Type<NgbCalendar>);
-    service = TestBed.get(NgbDatepickerKeyboardService);
-    mock = {state, focusDate: () => {}, focusSelect: () => {}};
+    calendar = TestBed.inject(NgbCalendar);
+    service = TestBed.inject(NgbDatepickerKeyboardService);
+    mock = {state, focusDate: () => {}, focusSelect: () => {}, calendar};
 
-    spyOn(mock, 'focusDate');
-    spyOn(mock, 'focusSelect');
+    spyOn(mock, <any>'focusDate');
+    spyOn(mock, <any>'focusSelect');
     spyOn(calendar, 'getNext');
     spyOn(calendar, 'getPrev');
   });

@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {NgbCalendar} from './ngb-calendar';
 import {NgbDatepicker} from './datepicker';
 import {Key} from '../util/key';
 
@@ -7,14 +6,16 @@ import {Key} from '../util/key';
  * A service that represents the keyboard navigation.
  *
  * Default keyboard shortcuts [are documented in the overview](#/components/datepicker/overview#keyboard-shortcuts)
+ *
+ * @since 5.2.0
  */
 @Injectable({providedIn: 'root'})
 export class NgbDatepickerKeyboardService {
   /**
    * Processes a keyboard event.
    */
-  processKey(event: KeyboardEvent, datepicker: NgbDatepicker, calendar: NgbCalendar) {
-    const state = datepicker.state;
+  processKey(event: KeyboardEvent, datepicker: NgbDatepicker) {
+    const {state, calendar} = datepicker;
     // tslint:disable-next-line:deprecation
     switch (event.which) {
       case Key.PageUp:

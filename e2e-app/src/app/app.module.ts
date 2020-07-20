@@ -10,7 +10,9 @@ import {NavigationComponent} from './navigation.component';
 
 import {DatepickerAutoCloseComponent} from './datepicker/autoclose/datepicker-autoclose.component';
 import {DatepickerFocusComponent} from './datepicker/focus/datepicker-focus.component';
+import {DatepickerMultipleComponent} from './datepicker/multiple/datepicker-multiple.component';
 import {DropdownAutoCloseComponent} from './dropdown/autoclose/dropdown-autoclose.component';
+import {DropdownClickComponent} from './dropdown/click/dropdown-click.component';
 import {DropdownFocusComponent} from './dropdown/focus/dropdown-focus.component';
 import {DropdownPositionComponent} from './dropdown/position/dropdown-position.component';
 import {ModalAutoCloseComponent} from './modal/autoclose/modal-autoclose.component';
@@ -35,8 +37,10 @@ import {TypeaheadValidationComponent} from './typeahead/validation/typeahead-val
     NavigationComponent,
     DatepickerAutoCloseComponent,
     DatepickerFocusComponent,
+    DatepickerMultipleComponent,
     DropdownAutoCloseComponent,
     DropdownFocusComponent,
+    DropdownClickComponent,
     DropdownPositionComponent,
     ModalAutoCloseComponent,
     ModalFocusComponent,

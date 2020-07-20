@@ -35,10 +35,15 @@
     "url": "https://github.com/ng-bootstrap/ng-bootstrap/issues"
   },
   "homepage": "https://github.com/ng-bootstrap/ng-bootstrap#readme",
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
   "peerDependencies": {
-    "@angular/common": "^8.0.0",
-    "@angular/core": "^8.0.0",
-    "@angular/forms": "^8.0.0",
-    "rxjs": "^6.4.0"
-  }
+    "@angular/common": "^10.0.0",
+    "@angular/core": "^10.0.0",
+    "@angular/forms": "^10.0.0",
+    "@angular/localize": "^10.0.0",
+    "rxjs": "^6.5.5"
+  },
+  "schematics": "./schematics/collection.json"
 }

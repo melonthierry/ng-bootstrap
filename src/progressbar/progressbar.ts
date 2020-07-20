@@ -1,4 +1,4 @@
-import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from '@angular/core';
 import {getValueInRange, isNumber} from '../util/util';
 import {NgbProgressbarConfig} from './progressbar-config';
 
@@ -8,12 +8,14 @@ import {NgbProgressbarConfig} from './progressbar-config';
 @Component({
   selector: 'ngb-progressbar',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
   template: `
     <div class="progress" [style.height]="height">
       <div class="progress-bar{{type ? ' bg-' + type : ''}}{{textType ? ' text-' + textType : ''}}
-      {{animated ? ' progress-bar-animated' : ''}}{{striped ? ' progress-bar-striped' : ''}}" role="progressbar" [style.width.%]="getPercentValue()"
+      {{animated ? ' progress-bar-animated' : ''}}{{striped ? ' progress-bar-striped' : ''}}"
+      role="progressbar" [style.width.%]="getPercentValue()"
       [attr.aria-valuenow]="getValue()" aria-valuemin="0" [attr.aria-valuemax]="max">
-        <span *ngIf="showValue" i18n="@@ngb.progressbar.value">{{getPercentValue()}}%</span><ng-content></ng-content>
+        <span *ngIf="showValue" i18n="@@ngb.progressbar.value">{{getValue() / max | percent}}</span><ng-content></ng-content>
       </div>
     </div>
   `
@@ -55,6 +57,8 @@ export class NgbProgressbar {
    *
    * Supports types based on Bootstrap background color variants, like:
    *  `"success"`, `"info"`, `"warning"`, `"danger"`, `"primary"`, `"secondary"`, `"dark"` and so on.
+   *
+   * @since 5.2.0
    */
   @Input() textType: string;
 

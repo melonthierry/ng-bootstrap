@@ -3,9 +3,20 @@
   "compilerOptions": {
     "outDir": "temp",
     "baseUrl": ".",
-    "module": "commonjs"
-  },
+    "target": "es2016"
+},
   "angularCompilerOptions": {
     "entryModule": "src/app/app.server.module#AppServerModule"
-  }
+  },
+  "files": [
+    "src/main.server.ts",
+    "server.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "src/**/*.po.ts",
+    "src/**/*.e2e-spec.ts"
+  ]
 }

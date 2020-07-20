@@ -16,6 +16,7 @@ import {
 import {NgbPopoverModule} from './popover.module';
 import {NgbPopoverWindow, NgbPopover} from './popover';
 import {NgbPopoverConfig} from './popover-config';
+import {NgbTooltip, NgbTooltipModule} from '..';
 
 @Injectable()
 class SpyService {
@@ -35,7 +36,7 @@ describe('ngb-popover-window', () => {
     // Cleaning elements, because of a TestBed issue with the id attribute
     Array.from(document.body.children).map((element: HTMLElement) => {
       if (element.tagName.toLocaleLowerCase() === 'div') {
-        element.parentNode.removeChild(element);
+        element.parentNode !.removeChild(element);
       }
     });
   });
@@ -727,6 +728,28 @@ describe('ngb-popover', () => {
       const buttonEl = fixture.debugElement.query(By.css('button'));
       triggerEvent(buttonEl, 'click');
     });
+  });
+});
+
+describe('popover-tooltip', () => {
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({declarations: [TestComponent], imports: [NgbPopoverModule, NgbTooltipModule]});
+  });
+
+  it(`should work when attached on the same element and container='body'`, () => {
+    const fixture = createTestComponent(`<button ngbPopover="Popover" ngbTooltip="Tooltip" container="body"></button>`);
+    const button = fixture.nativeElement.querySelector('button');
+    const tooltip = fixture.debugElement.query(By.directive(NgbTooltip)).injector.get(NgbTooltip);
+    const popover = fixture.debugElement.query(By.directive(NgbPopover)).injector.get(NgbPopover);
+
+    tooltip.open();
+    expect(tooltip.isOpen()).toBe(true);
+    expect(popover.isOpen()).toBe(false);
+
+    // this should open the popover and have produced the "Error: Failed to execute 'insertBefore' on 'Node':
+    // The node before which the new node is to be inserted is not a child of this node." exception with ivy
+    button.click();
   });
 });
 

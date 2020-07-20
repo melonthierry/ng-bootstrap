@@ -42,6 +42,14 @@
   </p>
 
   <p>
+    Since v5.2.0 datepicker also has the
+    <a routerLink="../api" fragment="NgbDatepickerState">State interface</a>
+    accessible via <code>datepicker.state</code> getter. It represents the readonly
+    part of the publicly accessible state. ex. what is currently focused, what is the first
+    and last visible dates, etc.
+  </p>
+
+  <p>
     If you have a very specific use case for the datepicker popup,
     you could always create you own one and use the inline datepicker inside.
   </p>
@@ -101,7 +109,7 @@
   <ngbd-code [snippet]="snippets.form"></ngbd-code>
 
   <p>
-    Alternatively you could use the <code>(dateSelect)</code> or <code>(select)</code> outputs.
+    Alternatively you could use the <code>(dateSelect)</code> output.
     The difference from <code>ngModel</code> is that outputs will continue emitting the same value,
     if user clicks on the same date. <code>NgModel</code> will do it only once.
   </p>
@@ -267,6 +275,19 @@
   </p>
 
   <ngbd-code [snippet]="snippets.todayTemplate"></ngbd-code>
+
+</ngbd-overview-section>
+
+
+<!-- MONTH LAYOUT CUSTOMIZATION-->
+<ngbd-overview-section [section]="sections['content-template']">
+  <p>
+    You can replace the content of the datepicker.
+    Combined with the NgbDatepickerMonthView you can customize the layout of months as in the
+    <a routerLink="../examples" fragment="custommonth">custom month layout example</a>.
+  </p>
+
+  <ngbd-code [snippet]="snippets.contentTemplate"></ngbd-code>
 
 </ngbd-overview-section>
 
