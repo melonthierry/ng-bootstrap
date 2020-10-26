@@ -54,7 +54,7 @@ ngb-datepicker-month {
 }
 
 .custom-day.range {
-  background-color: #007bf7;
+  background-color: #05BA6D;
 }
 
 .custom-day {
@@ -97,7 +97,7 @@ ngb-datepicker-month {
   &:after {
     border-radius: 20px;
     content: '';
-    background-color: #007bf7;
+    background-color: #05BA6D;
   }
 
   &::before {
@@ -126,13 +126,13 @@ ngb-datepicker-month {
 
 .custom-day-container {
   .range {
-    background-color: #69b0f7;
+    background-color: #05ba6e;
     color: #ffffff;
     position: relative;
 
     &::before {
       content: '';
-      background-color: #69b0f7;
+      background-color: #05ba6e;
       width: 10px;
       position: absolute;
       height: 100%;
@@ -145,7 +145,7 @@ ngb-datepicker-month {
   }
 
   .fromDate {
-    background: #007bf7;
+    background: #05BA6D;
     border-radius: 50%;
     position: absolute;
     z-index: 1;
@@ -155,12 +155,12 @@ ngb-datepicker-month {
     float: right;
     height: 100%;
     display: block;
-    background: #69b0f7;
+    background: #05ba6e;
     width: 50%;
   }
 
   .untilDate {
-    background: #007bf7;
+    background: #05BA6D;
     border-radius: 50%;
     position: absolute;
     z-index: 1;
@@ -174,12 +174,12 @@ ngb-datepicker-month {
     float: left;
     height: 100%;
     display: block;
-    background: #69b0f7;
+    background: #05ba6e;
     width: 50%;
   }
 
   span:hover {
-    color: #007bf7;
+    color: #05BA6D;
   }
 
   .focused {
